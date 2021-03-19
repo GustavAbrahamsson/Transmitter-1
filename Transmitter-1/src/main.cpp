@@ -1,6 +1,11 @@
 
 #include <Arduino.h>
 
+/*
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+*/
 
 
 // NRF24L01
@@ -25,9 +30,8 @@
 #define RE_SW 9
 
 // General
-#define TGL_SW 10
+#define TGL_SW 3
 #define BTN1 2
-#define BTN2 3
 
 // Joystick values
 int js1_x = 0;
@@ -62,7 +66,12 @@ void setup() {
 
   pinMode(TGL_SW, INPUT_PULLUP);
   pinMode(BTN1, INPUT_PULLUP);
-  pinMode(BTN2, INPUT_PULLUP);
+
+
+
+
+
+  pinMode(2,INPUT_PULLUP);
 
 }
 
@@ -79,6 +88,8 @@ void loop() {
   js2_sw = !digitalRead(JS2_SW);
   re_sw = !digitalRead(RE_SW);
 
+  Serial.println(digitalRead(2));
+
   state1CLK = digitalRead(CLK);
 
   if(state1CLK != state0CLK){
@@ -90,6 +101,8 @@ void loop() {
   }
   state0CLK = state1CLK;
 
+  /*
+
   Serial.print("1: "); Serial.print(js1_x); Serial.print(" | ");Serial.print(js1_y);Serial.print(" | ");Serial.println(js1_sw);
 
   Serial.print("2: "); Serial.print(js2_x); Serial.print(" | ");Serial.print(js2_y);Serial.print(" | ");Serial.println(js2_sw);
@@ -99,5 +112,5 @@ void loop() {
   Serial.print("RE: "); Serial.print(rotaryValue); Serial.print(" | ");Serial.println(re_sw);
 
   Serial.println("");
-  
+  */
 }
