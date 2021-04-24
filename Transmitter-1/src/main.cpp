@@ -33,6 +33,9 @@
 #define TGL_SW 3
 #define BTN1 2
 
+// General
+unsigned long timeVar = 0;
+
 // Joystick values
 int js1_x = 0;
 int js1_y = 0;
@@ -47,6 +50,9 @@ int state1CLK = 0;
 int state0CLK = 0;
 int rotaryValue = 0;
 bool re_sw = 0;
+
+// Toggle switch
+bool tgl_sw = 0;
 
 void setup() {
 
@@ -67,17 +73,12 @@ void setup() {
   pinMode(TGL_SW, INPUT_PULLUP);
   pinMode(BTN1, INPUT_PULLUP);
 
-
-
-
-
   pinMode(2,INPUT_PULLUP);
-
 }
 
 void loop() {
 
-  delay(1);
+  delay(5);
 
   js1_x = analogRead(JS1_X);
   js1_y = analogRead(JS1_Y);
@@ -88,7 +89,7 @@ void loop() {
   js2_sw = !digitalRead(JS2_SW);
   re_sw = !digitalRead(RE_SW);
 
-  Serial.println(digitalRead(2));
+  tgl_sw = !digitalRead(TGL_SW);
 
   state1CLK = digitalRead(CLK);
 
@@ -101,16 +102,19 @@ void loop() {
   }
   state0CLK = state1CLK;
 
-  /*
+  if(millis() - timeVar > 500){
+    timeVar = millis();
 
-  Serial.print("1: "); Serial.print(js1_x); Serial.print(" | ");Serial.print(js1_y);Serial.print(" | ");Serial.println(js1_sw);
+    Serial.print("1: "); Serial.print(js1_x); Serial.print(" | ");Serial.print(js1_y);Serial.print(" | ");Serial.println(js1_sw);
 
-  Serial.print("2: "); Serial.print(js2_x); Serial.print(" | ");Serial.print(js2_y);Serial.print(" | ");Serial.println(js2_sw);
-  
-  Serial.println("");
+    Serial.print("2: "); Serial.print(js2_x); Serial.print(" | ");Serial.print(js2_y);Serial.print(" | ");Serial.println(js2_sw);
+    
+    Serial.println("");
 
-  Serial.print("RE: "); Serial.print(rotaryValue); Serial.print(" | ");Serial.println(re_sw);
+    Serial.print("RE: "); Serial.print(rotaryValue); Serial.print(" | ");Serial.println(re_sw);
 
-  Serial.println("");
-  */
+    Serial.print("TGL: "); Serial.print(tgl_sw);
+
+    Serial.println("");
+  }
 }
