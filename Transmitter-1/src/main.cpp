@@ -1,12 +1,9 @@
 
 #include <Arduino.h>
 
-/*
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-*/
-
 
 // NRF24L01
 #define CE 7
@@ -54,7 +51,26 @@ bool re_sw = 0;
 // Toggle switch
 bool tgl_sw = 0;
 
+// NRF24L01
+RF24 radio(7, 8); // CE, CSN
+const byte address[6] = "35075";
+char package[] = "";
+
+void setupNRF() {
+  radio.begin();
+  radio.openWritingPipe(address);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.stopListening();
+}
+void sendData(String data) {
+  const char text[] = "Hello World";
+  //char data[] = text(char);
+  radio.write(&text, sizeof(text));
+}
+
 void setup() {
+
+  setupNRF();
 
   Serial.begin(9600);
   Serial.println("Program started");
@@ -102,7 +118,7 @@ void loop() {
   }
   state0CLK = state1CLK;
 
-  if(millis() - timeVar > 500){
+  if(millis() - timeVar > 100){
     timeVar = millis();
 
     Serial.print("1: "); Serial.print(js1_x); Serial.print(" | ");Serial.print(js1_y);Serial.print(" | ");Serial.println(js1_sw);
@@ -115,6 +131,10 @@ void loop() {
 
     Serial.print("TGL: "); Serial.print(tgl_sw);
 
-    Serial.println("");
+    Serial.println();
+    Serial.println();
+    Serial.println();
   }
+  //package[] = "Hello there";
+  sendData("Hello there");
 }
