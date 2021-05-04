@@ -19,7 +19,7 @@
 
 #define JS2_X A2
 #define JS2_Y A3
-#define JS2_SW 10
+#define JS2_SW 10  // Pin 10 happened to be the SS (Slave Select) pin!
 
 // Rotary encoder
 #define CLK 4
@@ -40,7 +40,7 @@ bool js1_sw = 0;
 
 int js2_x = 0;
 int js2_y = 0;
-bool js2_sw = 0;
+// bool js2_sw = 0;
 
 // Rotary encoder
 int state1CLK = 0;
@@ -54,7 +54,24 @@ bool tgl_sw = 0;
 // NRF24L01
 RF24 radio(7, 8); // CE, CSN
 const byte address[6] = "35075";
-char package[] = "";
+char package[64] = "";
+
+String analogToString(int data){
+  if(data == 0) return "0000";
+  String output;
+  char numberOfDigits = log10(data) + 1;
+  for(char i = 0; i < 4 - numberOfDigits; i++) output += "0";
+  output += String(data);
+  return output;
+}
+
+String rotaryToString(int data){
+  String output;
+  if(data >= 0) output += "0"; // If positive, add a zero
+  else output += "1"; // If negative, add a one
+  output += analogToString(data);
+  return output;
+}
 
 void setupNRF() {
   radio.begin();
@@ -62,10 +79,32 @@ void setupNRF() {
   radio.setPALevel(RF24_PA_MIN);
   radio.stopListening();
 }
-void sendData(String data) {
-  const char text[] = "Hello World";
-  //char data[] = text(char);
-  radio.write(&text, sizeof(text));
+
+void sendData(const char data[]) {
+  strcpy(package, data);
+  radio.write(&package, sizeof(package));
+}
+
+void sendAllData(){
+  String data = "";
+
+  data += analogToString(js1_x);        // 4
+  data += analogToString(js1_y);        // 4
+  data += String(js1_sw);               // 1
+  
+  data += analogToString(js2_x);        // 4
+  data += analogToString(js2_y);        // 4
+  // data += String(js2_sw);
+
+  data += String(tgl_sw);               // 1
+
+  data += rotaryToString(abs(rotaryValue));  // 5 (signed + 4)
+  data += String(re_sw);                // 1
+
+  char charData[data.length()];
+  strcpy(charData, data.c_str());
+  Serial.println(charData);
+  sendData(charData);
 }
 
 void setup() {
@@ -80,7 +119,7 @@ void setup() {
   pinMode(JS1_SW, INPUT_PULLUP);
   pinMode(JS2_X, INPUT);
   pinMode(JS2_Y, INPUT);
-  pinMode(JS2_SW, INPUT_PULLUP);
+  pinMode(JS2_SW, OUTPUT); // Made it OUTPUT since SS is affecting SPI
 
   pinMode(CLK, INPUT);
   pinMode(DT,  INPUT);
@@ -97,12 +136,12 @@ void loop() {
   delay(5);
 
   js1_x = analogRead(JS1_X);
-  js1_y = analogRead(JS1_Y);
+  js1_y = 1023 - analogRead(JS1_Y);
   js2_x = analogRead(JS2_X);
-  js2_y = analogRead(JS2_Y);
+  js2_y = 1023 - analogRead(JS2_Y);
 
   js1_sw = !digitalRead(JS1_SW);
-  js2_sw = !digitalRead(JS2_SW);
+  //js2_sw = !digitalRead(JS2_SW);
   re_sw = !digitalRead(RE_SW);
 
   tgl_sw = !digitalRead(TGL_SW);
@@ -111,16 +150,16 @@ void loop() {
 
   if(state1CLK != state0CLK){
     if(digitalRead(DT) != state1CLK){
-      rotaryValue--;
+      if(rotaryValue > -1023) rotaryValue--;
     }else{
-      rotaryValue++;
+      if(rotaryValue < 1023) rotaryValue++;
     }
   }
   state0CLK = state1CLK;
 
   if(millis() - timeVar > 100){
     timeVar = millis();
-
+    /*
     Serial.print("1: "); Serial.print(js1_x); Serial.print(" | ");Serial.print(js1_y);Serial.print(" | ");Serial.println(js1_sw);
 
     Serial.print("2: "); Serial.print(js2_x); Serial.print(" | ");Serial.print(js2_y);Serial.print(" | ");Serial.println(js2_sw);
@@ -134,7 +173,8 @@ void loop() {
     Serial.println();
     Serial.println();
     Serial.println();
+    */
+
+    sendAllData();
   }
-  //package[] = "Hello there";
-  sendData("Hello there");
 }
