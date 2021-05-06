@@ -28,7 +28,7 @@
 
 // General
 #define TGL_SW 3
-#define BTN1 2
+#define BTN1 2  // Isn't used.
 
 // General
 unsigned long timeVar = 0;
@@ -51,6 +51,9 @@ bool re_sw = 0;
 // Toggle switch
 bool tgl_sw = 0;
 
+// Switch
+bool btn_sw = 0;
+
 // NRF24L01
 RF24 radio(7, 8); // CE, CSN
 const byte address[6] = "35075";
@@ -59,16 +62,20 @@ char package[64] = "";
 String analogToString(int data){
   if(data == 0) return "0000";
   String output;
-  char numberOfDigits = log10(data) + 1;
+  char numberOfDigits = log10(abs(data)) + 1;
   for(char i = 0; i < 4 - numberOfDigits; i++) output += "0";
-  output += String(data);
+  output += String(abs(data));
   return output;
 }
 
 String rotaryToString(int data){
   String output;
-  if(data >= 0) output += "0"; // If positive, add a zero
-  else output += "1"; // If negative, add a one
+  if(data >= 0){
+    output += "0"; // If positive, add a zero
+  }
+  else if(data < 0) {
+    output += "1"; // If negative, add a one
+  }
   output += analogToString(data);
   return output;
 }
@@ -88,18 +95,20 @@ void sendData(const char data[]) {
 void sendAllData(){
   String data = "";
 
-  data += analogToString(js1_x);        // 4
-  data += analogToString(js1_y);        // 4
-  data += String(js1_sw);               // 1
+  data += analogToString(js1_x);        // 4: 0-3
+  data += analogToString(js1_y);        // 4: 4-7
+  data += String(js1_sw);               // 1: 8
   
-  data += analogToString(js2_x);        // 4
-  data += analogToString(js2_y);        // 4
+  data += analogToString(js2_x);        // 4: 9-12
+  data += analogToString(js2_y);        // 4: 13-16
   // data += String(js2_sw);
 
-  data += String(tgl_sw);               // 1
+  data += String(tgl_sw);               // 1: 17
 
-  data += rotaryToString(abs(rotaryValue));  // 5 (signed + 4)
-  data += String(re_sw);                // 1
+  data += rotaryToString(rotaryValue);  // 5: 18-22 (signed + 4)
+  data += String(re_sw);                // 23
+
+  //data += String(btn_sw);               (// 24)
 
   char charData[data.length()];
   strcpy(charData, data.c_str());
@@ -111,8 +120,8 @@ void setup() {
 
   setupNRF();
 
-  Serial.begin(9600);
-  Serial.println("Program started");
+  //Serial.begin(9600);
+  //Serial.println("Program started");
 
   pinMode(JS1_X, INPUT);
   pinMode(JS1_Y, INPUT);
@@ -132,9 +141,6 @@ void setup() {
 }
 
 void loop() {
-
-  delay(5);
-
   js1_x = analogRead(JS1_X);
   js1_y = 1023 - analogRead(JS1_Y);
   js2_x = analogRead(JS2_X);
@@ -146,19 +152,25 @@ void loop() {
 
   tgl_sw = !digitalRead(TGL_SW);
 
+  //btn_sw = !digitalRead(BTN1);
+
+  //Serial.println(btn_sw);
+
   state1CLK = digitalRead(CLK);
 
   if(state1CLK != state0CLK){
     if(digitalRead(DT) != state1CLK){
-      if(rotaryValue > -1023) rotaryValue--;
-    }else{
       if(rotaryValue < 1023) rotaryValue++;
+    }else{
+      if(rotaryValue > -1023) rotaryValue--;
     }
   }
   state0CLK = state1CLK;
 
   if(millis() - timeVar > 100){
     timeVar = millis();
+
+    sendAllData();
     /*
     Serial.print("1: "); Serial.print(js1_x); Serial.print(" | ");Serial.print(js1_y);Serial.print(" | ");Serial.println(js1_sw);
 
@@ -175,6 +187,5 @@ void loop() {
     Serial.println();
     */
 
-    sendAllData();
   }
 }
