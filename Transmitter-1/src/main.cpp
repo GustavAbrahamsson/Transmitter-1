@@ -167,7 +167,7 @@ void loop() {
   }
   state0CLK = state1CLK;
 
-  if(millis() - timeVar > 100){
+  if(millis() - timeVar > 10){
     timeVar = millis();
 
     sendAllData();
