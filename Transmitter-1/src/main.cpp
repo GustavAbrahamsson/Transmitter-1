@@ -30,50 +30,6 @@
 #define TGL_SW 3
 #define BTN1 2  // Isn't used.
 
-// Servos (Dxy: Leg at side D (L/R) x servo number y with y = 1 for coxa, 2 for femur and 3 for tibia)
-
-// In counter clockwise direction from front left leg:
-
-
-// Left side: SERVO_DRIVER_1
-
-// Leg 1: Front left
-#define L11 0 // Leg 1: Servo 1
-#define L12 1 // Leg 1: Servo 2
-#define L13 2 // Leg 1: Servo 3
-
-// Leg 2: Middle left
-#define L21 3 // Leg 2: Servo 1
-#define L22 4 // Leg 2: Servo 2
-#define L23 5 // Leg 2: Servo 3
-
-// Leg 3: Back left
-#define L31 6 // Leg 3: Servo 1
-#define L32 7 // Leg 3: Servo 2
-#define L33 8 // Leg 3: Servo 3
-
-
-
-
-// Right side: SERVO_DRIVER_2
-
-// Leg 1: Front left
-#define R41 7 // Leg 4: Servo 1
-#define R42 8 // Leg 4: Servo 2
-#define R43 9 // Leg 4: Servo 3
-
-// Leg 2: Middle left
-#define R51 10 // Leg 5: Servo 1
-#define R52 11 // Leg 5: Servo 2
-#define R53 12 // Leg 5: Servo 3
-
-// Leg 3: Back left
-#define R61 13 // Leg 5: Servo 1
-#define R62 14 // Leg 5: Servo 2
-#define R63 15 // Leg 5: Servo 3
-
-
-// General
 unsigned long timeVar = 0;
 
 // Joystick values
