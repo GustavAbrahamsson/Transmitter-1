@@ -41,6 +41,11 @@ int js2_x = 0;
 int js2_y = 0;
 // bool js2_sw = 0;
 
+int default_js1_x = 500;
+int default_js1_y = 500;
+int default_js2_x = 500;
+int default_js2_y = 500;
+
 // Rotary encoder
 int state1CLK = 0;
 int state0CLK = 0;
@@ -57,6 +62,14 @@ bool btn_sw = 0;
 RF24 radio(7, 8); // CE, CSN
 const byte address[6] = "35075";
 char package[64] = "";
+
+int jsAngle1 = 0;
+int jsAngle2 = 0;
+
+float jsSpeed1 = 0;
+double jsSpeed2 = 0;
+
+float deadZoneRatio = 0.03f;
 
 String analogToString(int data){
   if(data == 0) return "0000";
@@ -111,16 +124,44 @@ void sendAllData(){
 
   char charData[data.length()];
   strcpy(charData, data.c_str());
-  Serial.println(charData);
+  //Serial.println(charData);
   sendData(charData);
+}
+
+void calculateDirection1(){
+  js1_x -= 512;
+  js1_y -= 512;
+  jsAngle1 = atan2(js1_x,js1_y) * 180/3.14;
+  jsSpeed1 = sqrtf(square(js1_x) + square(js1_y)) / 512;
+  if(jsSpeed1 > 1.0f) jsSpeed1 = 1.0f;
+  Serial.println(jsAngle1);
+  Serial.println();
+  Serial.println(jsSpeed1);
+  //if(js1_x < 0) jsAngle1  = -jsAngle1;
+  //else jsAngle1 = abs(jsAngle1);
+  //if(js1_y < 0) jsAngle1 = -1.57 + jsAngle1;
+}
+
+void calculateDirection2(){
+  js2_x -= 512;
+  js2_y -= 512;
+  jsAngle2 = atan2(js2_x,js2_y) * 180/3.14;
+  jsSpeed2 = sqrtf(square(js2_y) + square(js2_y)) / 512;
+  if(jsSpeed2 > 1.0f) jsSpeed2 = 1.0f;
+  Serial.println(jsAngle2);
+  Serial.println();
+  Serial.println(jsSpeed2);
+  //if(js1_x < 0) jsAngle1  = -jsAngle1;
+  //else jsAngle1 = abs(jsAngle1);
+  //if(js1_y < 0) jsAngle1 = -1.57 + jsAngle1;
 }
 
 void setup() {
 
   setupNRF();
 
-  //Serial.begin(9600);
-  //Serial.println("Program started");
+  Serial.begin(9600);
+  Serial.println("Program started");
 
   pinMode(JS1_X, INPUT);
   pinMode(JS1_Y, INPUT);
@@ -137,7 +178,14 @@ void setup() {
   pinMode(BTN1, INPUT_PULLUP);
 
   pinMode(2,INPUT_PULLUP);
-}
+
+  default_js1_x = analogRead(JS1_X);
+  default_js1_y = 1023 - analogRead(JS1_Y);
+  default_js2_x = analogRead(JS2_X);
+  default_js2_y = 1023 - analogRead(JS2_Y);
+  
+  Serial.println("Default js values measured");
+  }
 
 void loop() {
   js1_x = analogRead(JS1_X);
@@ -156,6 +204,24 @@ void loop() {
   //Serial.println(btn_sw);
 
   state1CLK = digitalRead(CLK);
+
+  if(abs(default_js1_x - js1_x) < deadZoneRatio * 512 && abs(default_js1_y - js1_y) < deadZoneRatio * 512 ) {
+    jsAngle1 = 0;
+    jsSpeed1 = 0;
+  }
+  else{
+    calculateDirection1();
+  }
+  
+  if(abs(default_js2_x - js2_x) < deadZoneRatio * 512 && abs(default_js2_y - js2_y) < deadZoneRatio * 512 ){
+    jsAngle2 = 0;
+    jsSpeed2 = 0;
+  }
+  else{
+    calculateDirection2();
+  }
+
+  
 
   if(state1CLK != state0CLK){
     if(digitalRead(DT) != state1CLK){
@@ -185,6 +251,5 @@ void loop() {
     Serial.println();
     Serial.println();
     */
-
   }
 }
