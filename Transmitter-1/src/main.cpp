@@ -136,7 +136,7 @@ void calculateDirection1(){
   if(jsSpeed1 > 1.0f) jsSpeed1 = 1.0f;
   Serial.println(jsAngle1);
   Serial.println();
-  Serial.println(jsSpeed1);
+  //Serial.println(jsSpeed1);
   //if(js1_x < 0) jsAngle1  = -jsAngle1;
   //else jsAngle1 = abs(jsAngle1);
   //if(js1_y < 0) jsAngle1 = -1.57 + jsAngle1;
@@ -150,7 +150,7 @@ void calculateDirection2(){
   if(jsSpeed2 > 1.0f) jsSpeed2 = 1.0f;
   Serial.println(jsAngle2);
   Serial.println();
-  Serial.println(jsSpeed2);
+  //Serial.println(jsSpeed2);
   //if(js1_x < 0) jsAngle1  = -jsAngle1;
   //else jsAngle1 = abs(jsAngle1);
   //if(js1_y < 0) jsAngle1 = -1.57 + jsAngle1;
@@ -232,7 +232,7 @@ void loop() {
   }
   state0CLK = state1CLK;
 
-  if(millis() - timeVar > 10){
+  if(millis() - timeVar > 100){
     timeVar = millis();
 
     sendAllData();
