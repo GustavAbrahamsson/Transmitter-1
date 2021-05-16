@@ -52,6 +52,7 @@ int state0CLK = 0;
 int rotaryValue = 0;
 bool re_sw = 0;
 
+
 // Toggle switch
 bool tgl_sw = 0;
 
