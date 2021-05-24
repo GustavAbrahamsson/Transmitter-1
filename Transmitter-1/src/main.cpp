@@ -129,13 +129,13 @@ void sendAllData(){
 }
 
 void calculateDirection1(){
-  js1_x -= 512;
-  js1_y -= 512;
+  //js1_x -= 512;
+  //js1_y -= 512;
   jsAngle1 = atan2(js1_x,js1_y) * 180/3.14;
   jsSpeed1 = sqrtf(square(js1_x) + square(js1_y)) / 512;
   if(jsSpeed1 > 1.0f) jsSpeed1 = 1.0f;
-  Serial.println(jsAngle1);
-  Serial.println();
+  //Serial.println(jsAngle1);
+  //Serial.println();
   //Serial.println(jsSpeed1);
   //if(js1_x < 0) jsAngle1  = -jsAngle1;
   //else jsAngle1 = abs(jsAngle1);
@@ -143,13 +143,13 @@ void calculateDirection1(){
 }
 
 void calculateDirection2(){
-  js2_x -= 512;
-  js2_y -= 512;
+  //js2_x -= 512;
+  //js2_y -= 512;
   jsAngle2 = atan2(js2_x,js2_y) * 180/3.14;
   jsSpeed2 = sqrtf(square(js2_y) + square(js2_y)) / 512;
   if(jsSpeed2 > 1.0f) jsSpeed2 = 1.0f;
-  Serial.println(jsAngle2);
-  Serial.println();
+  //Serial.println(jsAngle2);
+  //Serial.println();
   //Serial.println(jsSpeed2);
   //if(js1_x < 0) jsAngle1  = -jsAngle1;
   //else jsAngle1 = abs(jsAngle1);
@@ -160,8 +160,8 @@ void setup() {
 
   setupNRF();
 
-  Serial.begin(9600);
-  Serial.println("Program started");
+  //Serial.begin(9600);
+  //Serial.println("Program started");
 
   pinMode(JS1_X, INPUT);
   pinMode(JS1_Y, INPUT);
@@ -184,7 +184,7 @@ void setup() {
   default_js2_x = analogRead(JS2_X);
   default_js2_y = 1023 - analogRead(JS2_Y);
   
-  Serial.println("Default js values measured");
+  //Serial.println("Default js values measured");
   }
 
 void loop() {
@@ -210,7 +210,7 @@ void loop() {
     jsSpeed1 = 0;
   }
   else{
-    calculateDirection1();
+    //calculateDirection1();
   }
   
   if(abs(default_js2_x - js2_x) < deadZoneRatio * 512 && abs(default_js2_y - js2_y) < deadZoneRatio * 512 ){
@@ -218,7 +218,7 @@ void loop() {
     jsSpeed2 = 0;
   }
   else{
-    calculateDirection2();
+    //calculateDirection2();
   }
 
   
@@ -239,7 +239,7 @@ void loop() {
     /*
     Serial.print("1: "); Serial.print(js1_x); Serial.print(" | ");Serial.print(js1_y);Serial.print(" | ");Serial.println(js1_sw);
 
-    Serial.print("2: "); Serial.print(js2_x); Serial.print(" | ");Serial.print(js2_y);Serial.print(" | ");Serial.println(js2_sw);
+    Serial.print("2: "); Serial.print(js2_x); Serial.print(" | ");Serial.print(js2_y);Serial.print(" | ");
     
     Serial.println("");
 
